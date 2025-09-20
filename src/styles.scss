@@ -1,0 +1,303 @@
+// Style variables and tokens
+:root {
+  /* Primary Brand Colors */
+  --primary-navy: #021B38;        
+  --primary-blue-gray: #727B9C;   
+  --accent-coral: #DE4843;        
+  
+  /* Neutral Colors */
+  --white: #FFFFFF;               
+  --light-gray: #F8F9FA;         
+  --medium-gray: #6C757D;        
+  --dark-gray: #333333;          
+  
+  /* Status Colors */
+  --success-green: #28A745;      
+  --warning-orange: #FFC107;     
+  --error-red: #DC3545;          
+  --info-blue: #17A2B8;         
+  
+  /* Background Variants */
+  --background-hero: linear-gradient(135deg, var(--primary-navy) 0%, #2C4B73 100%);
+  --background-section: #FAFBFC;
+  --background-card: var(--white);
+  
+  /* Typography */
+  --font-heading: 'freight-text-pro', 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Arial', 'Helvetica Neue', 'Helvetica', sans-serif;
+  --font-ui: 'Roboto', 'Arial', sans-serif;
+  --font-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  
+  /* Spacing scale (8px base unit) */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 1.5rem;     /* 24px */
+  --space-xl: 2rem;       /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+  --space-3xl: 4rem;      /* 64px */
+  --space-4xl: 6rem;      /* 96px */
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  
+  /* Breakpoints */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1400px;
+}
+
+// Global styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--medium-gray);
+  background: var(--background-section);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Typography styles
+.h1, h1 {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--primary-navy);
+  margin-bottom: 1.5rem;
+}
+
+.h2, h2 {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--primary-navy);
+  margin-bottom: 1.25rem;
+}
+
+.h3, h3 {
+  font-family: var(--font-heading);
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--primary-navy);
+  margin-bottom: 1rem;
+}
+
+.h4, h4 {
+  font-family: var(--font-ui);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--primary-navy);
+  margin-bottom: 0.875rem;
+}
+
+.h5, h5 {
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--primary-blue-gray);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.h6, h6 {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--primary-blue-gray);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// Button styles
+.btn-primary {
+  background: var(--primary-navy);
+  color: var(--white);
+  border: 2px solid var(--primary-navy);
+  padding: 0.75rem 2rem;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  
+  &:hover:not(:disabled) {
+    background: #1a365d;
+    border-color: #1a365d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(2, 27, 56, 0.2);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary-navy);
+  border: 2px solid var(--primary-blue-gray);
+  padding: 0.75rem 2rem;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  
+  &:hover:not(:disabled) {
+    background: var(--primary-blue-gray);
+    color: var(--white);
+    border-color: var(--primary-blue-gray);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-danger {
+  background: var(--accent-coral);
+  color: var(--white);
+  border: 2px solid var(--accent-coral);
+  padding: 0.75rem 2rem;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  
+  &:hover:not(:disabled) {
+    background: #c73631;
+    border-color: #c73631;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Form styles
+.form-label {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--dark-gray);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--dark-gray);
+  background: var(--white);
+  border: 2px solid #DEE2E6;
+  border-radius: 0.375rem;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary-blue-gray);
+    box-shadow: 0 0 0 3px rgba(114, 123, 156, 0.1);
+  }
+  
+  &.error {
+    border-color: var(--accent-coral);
+    
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(222, 72, 67, 0.1);
+    }
+  }
+}
+
+.form-error {
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--accent-coral);
+  margin-top: var(--space-sm);
+}
+
+// Responsive typography
+@media (max-width: 768px) {
+  .h1, h1 { font-size: 2.5rem; }
+  .h2, h2 { font-size: 2rem; }
+  .h3, h3 { font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .h1, h1 { font-size: 2rem; }
+  .h2, h2 { font-size: 1.75rem; }
+  .h3, h3 { font-size: 1.375rem; }
+}
+
+// Utility classes
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--space-sm); }
+.mb-2 { margin-bottom: var(--space-md); }
+.mb-3 { margin-bottom: var(--space-lg); }
+.mb-4 { margin-bottom: var(--space-xl); }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--space-sm); }
+.mt-2 { margin-top: var(--space-md); }
+.mt-3 { margin-top: var(--space-lg); }
+.mt-4 { margin-top: var(--space-xl); }

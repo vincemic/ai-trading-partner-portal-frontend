@@ -1,0 +1,182 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?LinkId=733558
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev-server-start",
+      "type": "npm",
+      "script": "start",
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "ng serve"
+          },
+          "endsPattern": {
+            "regexp": "Local:\\s+http://localhost:4200/"
+          }
+        }
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      }
+    },
+    {
+      "label": "dev-server-stop",
+      "type": "shell",
+      "command": "Get-Process -Name node -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like '*ng serve*' -or $_.ProcessName -eq 'node' } | Stop-Process -Force",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev-server-validate",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "try { $response = Invoke-WebRequest -Uri http://localhost:4200 -UseBasicParsing -TimeoutSec 5; if ($response.StatusCode -eq 200) { Write-Host 'Server is running' } else { Write-Error 'Server not responding'; exit 1 } } catch { Write-Error 'Server not running'; exit 1 }"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test-playwright-headless",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "playwright",
+        "test",
+        "--reporter=list"
+      ],
+      "group": "test",
+      "dependsOn": "dev-server-validate",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test-playwright-headed",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "playwright",
+        "test",
+        "--reporter=list",
+        "--headed"
+      ],
+      "group": "test",
+      "dependsOn": "dev-server-validate",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test-playwright-debug",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "playwright",
+        "test",
+        "--reporter=list",
+        "--headed",
+        "--debug"
+      ],
+      "group": "test",
+      "dependsOn": "dev-server-validate",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test-single-spec",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "playwright",
+        "test",
+        "${input:testFile}",
+        "--reporter=list",
+        "--project=chromium"
+      ],
+      "group": "test",
+      "dependsOn": "dev-server-validate",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "build: production",
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "lint: check",
+      "type": "npm",
+      "script": "lint",
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": ["$eslint-stylish"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "testFile",
+      "description": "Test file to run",
+      "default": "tests/simple-login.spec.ts",
+      "type": "promptString"
+    }
+  ]
+}
