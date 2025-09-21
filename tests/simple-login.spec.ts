@@ -4,7 +4,7 @@ test.describe('Simple Login Test', () => {
   test('should load login page', async ({ page }) => {
     await page.goto('/login');
     await expect(page).toHaveTitle(/Trading Partner Portal/);
-    await expect(page.locator('h1')).toContainText('PointC Trading Portal');
+    await expect(page.locator('h1')).toContainText('Point C Health Trading Portal');
   });
 
   test('should show login form elements', async ({ page }) => {

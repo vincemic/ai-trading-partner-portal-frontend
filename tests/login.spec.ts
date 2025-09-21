@@ -14,7 +14,7 @@ test.describe('Login Functionality', () => {
 
   test.describe('UI Elements and Validation', () => {
     test('should display all required form elements', async () => {
-      await expect(loginPage.loginTitle).toHaveText('PointC Trading Portal');
+      await expect(loginPage.loginTitle).toHaveText('Point C Health Trading Portal');
       await expect(loginPage.partnerSelect).toBeVisible();
       await expect(loginPage.userIdInput).toBeVisible();
       await expect(loginPage.roleSelect).toBeVisible();

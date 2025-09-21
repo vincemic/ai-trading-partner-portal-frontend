@@ -25,7 +25,7 @@ export class LoginPage {
 
   async goto() {
     await this.page.goto('/login');
-    await expect(this.loginTitle).toHaveText('PointC Trading Portal');
+    await expect(this.loginTitle).toHaveText('Point C Health Trading Portal');
   }
 
   async selectPartner(partner: string) {
