@@ -5,7 +5,7 @@ export const environment = {
   enableLogging: true,
   enableTelemetry: false,
   mockData: false,
-  sseEnabled: false,
+  sseEnabled: true,
   pollingFallbackInterval: 60000, // 60 seconds
   maxConcurrentSseConnections: 3,
   sessionTokenKey: 'portalSessionToken'
