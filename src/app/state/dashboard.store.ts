@@ -139,7 +139,6 @@ export class DashboardStore {
       this._topErrors.set(topErrors);
     } catch (error) {
       this._error.set(error instanceof Error ? error.message : 'Failed to load dashboard');
-      console.error('Error loading dashboard:', error);
     } finally {
       this._loading.set(false);
     }

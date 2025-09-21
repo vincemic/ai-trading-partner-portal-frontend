@@ -232,7 +232,11 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
-    await this.dashboardStore.load();
+    try {
+      await this.dashboardStore.load();
+    } catch (error) {
+      // Error handling is done in the store
+    }
   }
 
   ngOnDestroy(): void {
@@ -248,17 +252,14 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   onErrorClicked(category: string): void {
-    console.log('Error category clicked:', category);
     // Navigate to files page with error filter
   }
 
   onFilterByError(category: string): void {
-    console.log('Filter by error:', category);
     // Apply error filter to files view
   }
 
   onViewAllErrors(): void {
-    console.log('View all errors clicked');
     // Navigate to errors/audit page
   }
 }
