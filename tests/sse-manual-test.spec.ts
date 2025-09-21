@@ -59,7 +59,7 @@ test.describe('SSE Manual Connection Test', () => {
         try {
           if (results.eventSourceSupported) {
             const token = localStorage.getItem('portalSessionToken') || 'test-token';
-            const url = `/api/events/stream?sessionToken=${encodeURIComponent(token)}`;
+            const url = `/api/events/stream?token=${encodeURIComponent(token)}`;
             
             console.log('Testing SSE connection to:', url);
             results.connectionAttempted = true;
@@ -235,7 +235,7 @@ test.describe('SSE Manual Connection Test', () => {
 
       // Test 2: With session token as query param
       try {
-        const response2 = await fetch(`${baseUrl}?sessionToken=test-token`);
+        const response2 = await fetch(`${baseUrl}?token=test-token`);
         tests.push({
           name: 'Query param auth',
           status: response2.status,

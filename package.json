@@ -54,6 +54,7 @@
     "@angular/compiler-cli": "^20.3.0",
     "@playwright/test": "^1.55.0",
     "eslint-config-prettier": "^10.1.8",
+    "http-proxy-middleware": "^3.0.5",
     "prettier": "^3.6.2",
     "typescript": "~5.9.2"
   }

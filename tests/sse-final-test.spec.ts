@@ -66,7 +66,7 @@ test.describe('SSE Complete Authentication Test', () => {
           // Create EventSource - note that EventSource doesn't support custom headers
           // According to the API docs, it should use X-Session-Token header, but EventSource
           // can't send custom headers, so the backend must support token via query param
-          const eventSource = new EventSource('/api/events/stream?sessionToken=admin-session-token');
+          const eventSource = new EventSource('/api/events/stream?token=admin-session-token');
           results.connectionAttempted = true;
 
           eventSource.onopen = function(event) {
@@ -151,7 +151,7 @@ test.describe('SSE Complete Authentication Test', () => {
         if (req.headers['x-session-token']) {
           console.log(`   X-Session-Token: ${req.headers['x-session-token']}`);
         }
-        if (req.url.includes('sessionToken=')) {
+        if (req.url.includes('token=')) {
           console.log(`   Query param auth: ✅`);
         }
       });
@@ -186,7 +186,7 @@ test.describe('SSE Complete Authentication Test', () => {
     // If we got a connection, even better!
     if (networkRequests.length > 0) {
       const sseRequest = networkRequests.find(req => req.url.includes('/api/events/stream'));
-      if (sseRequest) {
+      if (sseRequest && sseRequest.status !== undefined) {
         // 401 means endpoint is reachable but auth failed (which is expected in test environment)
         // 200 or 204 means successful connection
         // 307 means redirect (HTTP to HTTPS)

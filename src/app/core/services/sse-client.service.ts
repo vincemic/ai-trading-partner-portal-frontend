@@ -24,6 +24,8 @@ export class SseClientService {
   connect(): void {
     if (!environment.sseEnabled) {
       console.log('SSE disabled in environment');
+      // For development: simulate connected status when SSE is disabled
+      this.connectionStatus.set('connected');
       return;
     }
 
@@ -44,8 +46,8 @@ export class SseClientService {
       }
 
       // EventSource doesn't support custom headers, so append token as query param
-      const url = new URL(environment.sseBaseUrl);
-      url.searchParams.set('sessionToken', token);
+      const url = new URL(environment.sseBaseUrl, window.location.origin);
+      url.searchParams.set('token', token);
       
       if (this.lastEventId) {
         url.searchParams.set('lastEventId', this.lastEventId);

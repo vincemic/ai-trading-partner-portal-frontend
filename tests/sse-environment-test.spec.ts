@@ -72,7 +72,7 @@ test.describe('SSE Environment Verification', () => {
 
       try {
         // Test creating EventSource
-        const testSource = new EventSource('/api/events/stream?sessionToken=admin-session-token');
+        const testSource = new EventSource('/api/events/stream?token=admin-session-token');
         results.canCreateEventSource = true;
         
         // Close immediately to avoid hanging
@@ -142,7 +142,7 @@ test.describe('SSE Environment Verification', () => {
           results.step2_tokenSet = true;
 
           // Step 3: Attempt SSE connection
-          const eventSource = new EventSource('/api/events/stream?sessionToken=admin-session-token');
+          const eventSource = new EventSource('/api/events/stream?token=admin-session-token');
           results.step3_sseAttempted = true;
 
           let requestMade = false;

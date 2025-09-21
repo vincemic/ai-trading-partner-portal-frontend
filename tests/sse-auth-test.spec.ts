@@ -104,7 +104,7 @@ test.describe('SSE Connection with Authentication', () => {
       // Test EventSource creation
       if (results.hasEventSource) {
         try {
-          const testUrl = results.environmentCheck.sseBaseUrl + '?sessionToken=test-token';
+          const testUrl = results.environmentCheck.sseBaseUrl + '?token=test-token';
           const testEventSource = new EventSource(testUrl);
           results.canCreateEventSource = true;
           testEventSource.close();

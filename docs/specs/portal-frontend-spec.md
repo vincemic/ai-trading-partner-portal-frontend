@@ -173,7 +173,7 @@ export interface AuditSearchParams { page?: number; pageSize?: number; partnerId
 
 ## 10. SSE Client Integration
 
-- Service `SseClientService` establishing `EventSource` to `/api/events/stream` with session token via `X-Session-Token` header (using query param fallback `?sessionToken=` when EventSource header limitations require it).  
+- Service `SseClientService` establishing `EventSource` to `/api/events/stream` with session token via `X-Session-Token` header (using query param fallback `?token=` when EventSource header limitations require it).  
 - Event Types -> Handlers:  
   - `file.created`: Trigger refresh of recent files (if filter active).  
   - `file.statusChanged`: Update item in FilesStore if present.  

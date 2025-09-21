@@ -418,7 +418,7 @@ Future Extension (Phase 2):
 Endpoint: `GET /api/events/stream` (excluded from OpenAPI per spec).
 
 Client Service (`SseClientService`):
-- Accepts session token; if EventSource cannot set custom header, token appended as `?sessionToken=` query param (backend supports both).
+- Accepts session token; if EventSource cannot set custom header, token appended as `?token=` query param (backend supports both).
 - Configurable backoff sequence: `[1000, 2000, 5000, 10000, 15000, 30000]` ms (cap remains at 30s).
 - Maintains `lastEventId` (sequence) from `event.id` field; includes `Last-Event-ID` header on reconnect when possible.
 - Emits typed discriminated union events to a lightweight `EventBus` (simple `Subject` or signal-based dispatcher).
