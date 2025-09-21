@@ -42,20 +42,42 @@ export class SessionService {
   }
 
   login(request: LoginRequest): Observable<LoginResponse> {
-    const endpoint = environment.mockData ? '/api/fake-login' : '/api/login';
     return new Observable<LoginResponse>(observer => {
-      this.http.post<LoginResponse>(`${environment.apiBaseUrl}${endpoint}`, request)
-        .subscribe({
-          next: (response) => {
-            this.setSession(response.token, response.user);
-            observer.next(response);
-            observer.complete();
-          },
-          error: (error) => {
-            observer.error(error);
-          }
-        });
+      // For testing purposes, use predefined session tokens based on role
+      // In production, this would be a real API call
+      const token = this.generateTestToken(request.role);
+      const user: SessionUser = {
+        userId: request.userId,
+        partnerId: request.partner,
+        role: request.role
+      };
+      
+      const response: LoginResponse = {
+        token: token,
+        user: user
+      };
+
+      // Simulate API delay
+      setTimeout(() => {
+        this.setSession(response.token, response.user);
+        observer.next(response);
+        observer.complete();
+      }, 300);
     });
+  }
+
+  private generateTestToken(role: string): string {
+    // Use predefined tokens that the backend API recognizes
+    switch (role) {
+      case 'PartnerAdmin':
+        return 'admin-session-token';
+      case 'PartnerUser':
+        return 'user-session-token';
+      case 'InternalSupport':
+        return 'test-admin-user1';
+      default:
+        return 'test-session-token';
+    }
   }
 
   logout(): void {

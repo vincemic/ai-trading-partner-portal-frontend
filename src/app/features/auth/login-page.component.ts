@@ -45,11 +45,11 @@ interface LoginForm {
             <label for="partner" class="form-label">Partner Organization</label>
             <select id="partner" formControlName="partner" class="form-input" [class.error]="loginForm.get('partner')?.invalid && loginForm.get('partner')?.touched">
               <option value="">Select your organization</option>
-              <option value="acme-healthcare">Acme Healthcare</option>
-              <option value="metro-medical">Metro Medical Group</option>
-              <option value="riverside-health">Riverside Health System</option>
-              <option value="summit-care">Summit Care Partners</option>
-              <option value="coastal-medical">Coastal Medical Center</option>
+              <option value="11111111-1111-1111-1111-111111111111">Acme Corporation</option>
+              <option value="22222222-2222-2222-2222-222222222222">Global Logistics Inc</option>
+              <option value="33333333-3333-3333-3333-333333333333">TechFlow Systems</option>
+              <option value="44444444-4444-4444-4444-444444444444">MegaTrade Ltd</option>
+              <option value="55555555-5555-5555-5555-555555555555">DataSync Partners</option>
             </select>
             @if (loginForm.get('partner')?.invalid && loginForm.get('partner')?.touched) {
               <div class="form-error">Please select your organization</div>

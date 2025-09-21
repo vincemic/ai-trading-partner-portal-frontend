@@ -21,8 +21,9 @@ export class DashboardPage {
 
   async expectToBeOnDashboard() {
     await expect(this.page).toHaveURL(/\/dashboard/);
-    // Wait for the page to be fully loaded
-    await this.page.waitForLoadState('networkidle');
+    // Wait for the page to be fully loaded, but don't wait for networkidle as it may timeout
+    // Instead, wait for a key element to be visible
+    await expect(this.pageTitle).toBeVisible({ timeout: 10000 });
   }
 
   async expectUserInfo(userId: string, role: string) {

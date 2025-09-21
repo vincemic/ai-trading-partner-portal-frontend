@@ -156,7 +156,7 @@ test.describe('Login Functionality', () => {
 
     test('should show error for missing user ID', async () => {
       // Fill other fields but leave user ID empty
-      await loginPage.selectPartner('acme-healthcare');
+      await loginPage.selectPartner('11111111-1111-1111-1111-111111111111');
       await loginPage.selectRole('PartnerUser');
       
       // Button should be disabled when required field is missing
@@ -172,7 +172,7 @@ test.describe('Login Functionality', () => {
 
     test('should show error for missing role selection', async () => {
       // Fill other fields but leave role empty
-      await loginPage.selectPartner('acme-healthcare');
+      await loginPage.selectPartner('11111111-1111-1111-1111-111111111111');
       await loginPage.enterUserId('test.user');
       
       // Button should be disabled when required field is missing
@@ -186,10 +186,16 @@ test.describe('Login Functionality', () => {
       await expect(loginPage.page.locator('.form-error')).toContainText('Please select your role');
     });
 
-    test('should enable login button when all fields are filled', async () => {
-      await loginPage.selectPartner('acme-healthcare');
+    test('should enable login button when all fields are filled', async ({ page }) => {
+      const loginPage = new LoginPage(page);
+      await loginPage.goto();
+      
+      await loginPage.selectPartner('11111111-1111-1111-1111-111111111111');
       await loginPage.enterUserId('test.user');
       await loginPage.selectRole('PartnerUser');
+      
+      // Wait a bit for form validation to complete
+      await page.waitForTimeout(100);
       
       expect(await loginPage.isLoginButtonDisabled()).toBe(false);
     });

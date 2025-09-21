@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Simple Login Test', () => {
   test('should load login page', async ({ page }) => {
     await page.goto('/login');
-    await expect(page).toHaveTitle(/PointC/);
+    await expect(page).toHaveTitle(/Trading Partner Portal/);
     await expect(page.locator('h1')).toContainText('PointC Trading Portal');
   });
 
@@ -21,8 +21,8 @@ test.describe('Simple Login Test', () => {
     await page.goto('/login');
     
     // Fill the form
-    await page.selectOption('#partner', 'acme-healthcare');
-    await page.fill('#userId', 'test-user');
+    await page.selectOption('#partner', '11111111-1111-1111-1111-111111111111');
+    await page.fill('#userId', 'test-user@acme.com');
     await page.selectOption('#role', 'PartnerUser');
     
     // Submit the form
