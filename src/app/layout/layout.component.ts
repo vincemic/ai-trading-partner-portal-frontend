@@ -22,28 +22,24 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
                routerLinkActive="active" 
                class="nav-link"
                [attr.aria-current]="isActive('/dashboard') ? 'page' : null">
-              <span class="nav-icon">📊</span>
               Dashboard
             </a>
             <a routerLink="/keys" 
                routerLinkActive="active" 
                class="nav-link"
                [attr.aria-current]="isActive('/keys') ? 'page' : null">
-              <span class="nav-icon">🔐</span>
               Keys
             </a>
             <a routerLink="/sftp" 
                routerLinkActive="active" 
                class="nav-link"
                [attr.aria-current]="isActive('/sftp') ? 'page' : null">
-              <span class="nav-icon">🔗</span>
               SFTP
             </a>
             <a routerLink="/files" 
                routerLinkActive="active" 
                class="nav-link"
                [attr.aria-current]="isActive('/files') ? 'page' : null">
-              <span class="nav-icon">📁</span>
               Files
             </a>
             @if (showAuditLink()) {
@@ -51,7 +47,6 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
                  routerLinkActive="active" 
                  class="nav-link"
                  [attr.aria-current]="isActive('/audit') ? 'page' : null">
-                <span class="nav-icon">📋</span>
                 Audit
               </a>
             }
@@ -172,7 +167,6 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
     .nav-link {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
       font-family: var(--font-ui);
       font-size: 0.9rem;
       font-weight: 500;
@@ -192,10 +186,6 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
       color: var(--primary-navy);
       background: var(--background-section);
       font-weight: 600;
-    }
-
-    .nav-icon {
-      font-size: 1rem;
     }
 
     .navbar-actions {
@@ -413,10 +403,6 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
       .nav-link {
         padding: 0.5rem;
         font-size: 0.8rem;
-      }
-
-      .nav-icon {
-        font-size: 0.9rem;
       }
     }
   `]

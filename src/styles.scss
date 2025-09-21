@@ -149,7 +149,6 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   
   &:hover:not(:disabled) {
     background: #1a365d;
@@ -181,7 +180,6 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   
   &:hover:not(:disabled) {
     background: var(--primary-blue-gray);
@@ -210,7 +208,6 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   
   &:hover:not(:disabled) {
     background: #c73631;

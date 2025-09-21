@@ -27,7 +27,6 @@ import { RevokeKeyRequest, KeySummaryDto } from '../../../core/models/dto.models
   template: `
     <div class="dialog-container">
       <h2 mat-dialog-title>
-        <mat-icon color="warn">warning</mat-icon>
         Revoke PGP Key
       </h2>
       
@@ -130,7 +129,6 @@ import { RevokeKeyRequest, KeySummaryDto } from '../../../core/models/dto.models
           color="warn" 
           (click)="onRevoke()" 
           [disabled]="!canRevoke() || loading()">
-          <mat-icon>delete_forever</mat-icon>
           Revoke Key
         </button>
       </div>

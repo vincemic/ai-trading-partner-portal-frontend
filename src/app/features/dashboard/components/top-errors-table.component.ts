@@ -19,7 +19,6 @@ import { TopErrorsResponse } from '../../../core/models/dto.models';
               color="primary" 
               (click)="onViewAllErrors()"
               class="view-all-btn">
-              <mat-icon>list</mat-icon>
               View All Errors
             </button>
           }
@@ -50,7 +49,6 @@ import { TopErrorsResponse } from '../../../core/models/dto.models';
             <div class="table-row" (click)="onErrorClick(error.category)">
               <div class="data-cell category">
                 <div class="error-info">
-                  <mat-icon class="error-icon">error_outline</mat-icon>
                   <div class="error-details">
                     <div class="error-category">{{ formatErrorCategory(error.category) }}</div>
                     <div class="error-description">{{ getErrorDescription(error.category) }}</div>
@@ -73,10 +71,10 @@ import { TopErrorsResponse } from '../../../core/models/dto.models';
               </div>
               <div class="data-cell action">
                 <button 
-                  mat-icon-button 
+                  mat-button 
                   (click)="onFilterByError(error.category); $event.stopPropagation()"
                   [title]="'Filter files by ' + error.category">
-                  <mat-icon>filter_list</mat-icon>
+                  Filter
                 </button>
               </div>
             </div>
@@ -99,7 +97,6 @@ import { TopErrorsResponse } from '../../../core/models/dto.models';
         }
       } @else {
         <div class="table-empty">
-          <mat-icon class="empty-icon">check_circle_outline</mat-icon>
           <h4>No Errors Detected</h4>
           <p>All file transfers are processing successfully.</p>
         </div>

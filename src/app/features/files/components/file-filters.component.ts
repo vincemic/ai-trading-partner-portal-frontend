@@ -38,7 +38,6 @@ interface FilterState {
     <div class="filters-container">
       <div class="filters-header">
         <h3 class="filters-title">
-          <mat-icon>filter_list</mat-icon>
           Filters
         </h3>
         <div class="filters-actions">
@@ -47,14 +46,12 @@ interface FilterState {
             color="warn" 
             (click)="clearAllFilters()"
             [disabled]="!hasActiveFilters()">
-            <mat-icon>clear_all</mat-icon>
             Clear All
           </button>
           <button 
             mat-button 
             [class.expanded]="expanded()"
             (click)="toggleExpanded()">
-            <mat-icon>{{ expanded() ? 'expand_less' : 'expand_more' }}</mat-icon>
             {{ expanded() ? 'Collapse' : 'More Filters' }}
           </button>
         </div>
@@ -140,31 +137,26 @@ interface FilterState {
             @if (filterForm.get('direction')?.value) {
               <mat-chip (removed)="removeFilter('direction')">
                 Direction: {{ filterForm.get('direction')?.value }}
-                <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip>
             }
             @if (filterForm.get('status')?.value) {
               <mat-chip (removed)="removeFilter('status')">
                 Status: {{ filterForm.get('status')?.value }}
-                <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip>
             }
             @if (filterForm.get('docType')?.value) {
               <mat-chip (removed)="removeFilter('docType')">
                 Type: {{ filterForm.get('docType')?.value }}
-                <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip>
             }
             @if (filterForm.get('dateFrom')?.value) {
               <mat-chip (removed)="removeFilter('dateFrom')">
                 From: {{ formatDate(filterForm.get('dateFrom')?.value) }}
-                <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip>
             }
             @if (filterForm.get('dateTo')?.value) {
               <mat-chip (removed)="removeFilter('dateTo')">
                 To: {{ formatDate(filterForm.get('dateTo')?.value) }}
-                <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip>
             }
           </mat-chip-set>

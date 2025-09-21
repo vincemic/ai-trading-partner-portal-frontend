@@ -35,11 +35,9 @@ import { RevokeKeyDialogComponent } from './dialogs/revoke-key-dialog.component'
         <div class="keys-content">
           <div class="keys-actions">
             <button type="button" class="btn-primary" (click)="openGenerateDialog()">
-              <mat-icon>vpn_key</mat-icon>
               Generate New Key
             </button>
             <button type="button" class="btn-secondary" (click)="openUploadDialog()">
-              <mat-icon>cloud_upload</mat-icon>
               Upload Key
             </button>
           </div>
@@ -73,13 +71,11 @@ import { RevokeKeyDialogComponent } from './dialogs/revoke-key-dialog.component'
                   <div class="key-actions">
                     @if (key.status === 'Active' && !key.isPrimary) {
                       <button type="button" class="btn-secondary btn-sm" (click)="promoteKey(key.keyId)">
-                        <mat-icon>star</mat-icon>
                         Make Primary
                       </button>
                     }
                     @if (key.status === 'Active') {
                       <button type="button" class="btn-danger btn-sm" (click)="openRevokeDialog(key)">
-                        <mat-icon>delete</mat-icon>
                         Revoke
                       </button>
                     }

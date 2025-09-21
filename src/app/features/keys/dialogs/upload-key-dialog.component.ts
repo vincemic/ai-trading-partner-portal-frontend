@@ -140,7 +140,6 @@ import { UploadKeyRequest, KeySummaryDto } from '../../../core/models/dto.models
           color="primary" 
           (click)="onUpload()" 
           [disabled]="form.invalid || loading()">
-          <mat-icon>cloud_upload</mat-icon>
           Upload Key
         </button>
       </div>

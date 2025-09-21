@@ -131,7 +131,6 @@ import { GenerateKeyRequest, GenerateKeyResponse } from '../../../core/models/dt
             color="primary" 
             (click)="onGenerate()" 
             [disabled]="form.invalid || loading()">
-            <mat-icon>vpn_key</mat-icon>
             Generate Key
           </button>
         } @else {

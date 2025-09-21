@@ -43,7 +43,6 @@ import { RotatePasswordDialogComponent } from './dialogs/rotate-password-dialog.
             </div>
             <div class="credential-actions">
               <button type="button" class="btn-primary" (click)="openRotateDialog()">
-                <mat-icon>sync</mat-icon>
                 Rotate Password
               </button>
             </div>

@@ -220,7 +220,6 @@ interface PasswordComplexity {
             color="primary" 
             (click)="onRotate()" 
             [disabled]="!canRotate() || loading()">
-            <mat-icon>sync</mat-icon>
             Rotate Password
           </button>
         } @else {

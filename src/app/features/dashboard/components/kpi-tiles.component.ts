@@ -11,22 +11,17 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
     <div class="kpi-grid">
       <div class="kpi-tile" [class.trend-up]="filesTrend() === 'up'" [class.trend-down]="filesTrend() === 'down'">
         <div class="kpi-header">
-          <mat-icon class="kpi-icon">description</mat-icon>
           <span class="kpi-label">Files Today</span>
           @if (filesTrend() !== 'neutral') {
-            <mat-icon class="trend-icon" [class.trend-up]="filesTrend() === 'up'" [class.trend-down]="filesTrend() === 'down'">
-              {{ filesTrend() === 'up' ? 'trending_up' : 'trending_down' }}
-            </mat-icon>
+            {{ filesTrend() === 'up' ? '↗' : '↘' }}
           }
         </div>
         <div class="kpi-value">{{ totalFiles() }}</div>
         <div class="kpi-breakdown">
           <span class="breakdown-item">
-            <mat-icon>call_received</mat-icon>
             {{ summary()?.inboundFiles24h || 0 }} In
           </span>
           <span class="breakdown-item">
-            <mat-icon>call_made</mat-icon>
             {{ summary()?.outboundFiles24h || 0 }} Out
           </span>
         </div>
@@ -34,12 +29,9 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
 
       <div class="kpi-tile" [class.success]="successRate() >= 95" [class.warning]="successRate() < 95 && successRate() >= 85" [class.error]="successRate() < 85">
         <div class="kpi-header">
-          <mat-icon class="kpi-icon">check_circle</mat-icon>
           <span class="kpi-label">Success Rate</span>
           @if (successRateTrend() !== 'neutral') {
-            <mat-icon class="trend-icon" [class.trend-up]="successRateTrend() === 'up'" [class.trend-down]="successRateTrend() === 'down'">
-              {{ successRateTrend() === 'up' ? 'trending_up' : 'trending_down' }}
-            </mat-icon>
+            {{ successRateTrend() === 'up' ? '↗' : '↘' }}
           }
         </div>
         <div class="kpi-value">{{ successRate().toFixed(1) }}%</div>
@@ -54,12 +46,9 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
 
       <div class="kpi-tile">
         <div class="kpi-header">
-          <mat-icon class="kpi-icon">speed</mat-icon>
           <span class="kpi-label">Avg Processing</span>
           @if (processingTimeTrend() !== 'neutral') {
-            <mat-icon class="trend-icon" [class.trend-up]="processingTimeTrend() === 'up'" [class.trend-down]="processingTimeTrend() === 'down'">
-              {{ processingTimeTrend() === 'up' ? 'trending_up' : 'trending_down' }}
-            </mat-icon>
+            {{ processingTimeTrend() === 'up' ? '↗' : '↘' }}
           }
         </div>
         <div class="kpi-value">{{ processingTimeDisplay() }}</div>
@@ -74,17 +63,14 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
 
       <div class="kpi-tile">
         <div class="kpi-header">
-          <mat-icon class="kpi-icon">storage</mat-icon>
           <span class="kpi-label">Data Volume</span>
         </div>
         <div class="kpi-value">{{ dataVolumeDisplay() }}</div>
         <div class="kpi-breakdown">
           <span class="breakdown-item">
-            <mat-icon>description</mat-icon>
             {{ formatBytes(summary()?.totalBytes24h || 0) }}
           </span>
           <span class="breakdown-item">
-            <mat-icon>analytics</mat-icon>
             {{ formatBytes(summary()?.avgFileSizeBytes24h || 0) }} avg
           </span>
         </div>
