@@ -443,7 +443,9 @@ export class LayoutComponent {
 
   readonly userRole = computed(() => {
     const session = this.session();
-    return session ? session.role : '';
+    if (!session) return '';
+    // Format role from camelCase to spaced uppercase (e.g., "PartnerUser" -> "PARTNER USER")
+    return session.role.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
   });
 
   readonly showAuditLink = computed(() => {

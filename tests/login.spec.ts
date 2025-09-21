@@ -45,8 +45,19 @@ test.describe('Login Functionality', () => {
     });
 
     test('should show validation errors for empty form submission', async () => {
-      await loginPage.clickLogin();
-      await loginPage.expectFormValidationErrors();
+      // With empty form, the submit button should be disabled (good UX)
+      await expect(loginPage.loginButton).toBeDisabled();
+      
+      // Touch all fields to trigger validation
+      await loginPage.partnerSelect.click();
+      await loginPage.partnerSelect.blur();
+      await loginPage.userIdInput.click();
+      await loginPage.userIdInput.blur();
+      await loginPage.roleSelect.click();
+      await loginPage.roleSelect.blur();
+      
+      // Should show validation errors for all empty required fields
+      await expect(loginPage.page.locator('.form-error')).toHaveCount(3);
     });
   });
 
@@ -128,24 +139,51 @@ test.describe('Login Functionality', () => {
 
   test.describe('Form Validation Tests', () => {
     test('should show error for missing partner selection', async () => {
+      // Fill other fields but leave partner empty
       await loginPage.enterUserId('test.user');
       await loginPage.selectRole('PartnerUser');
-      await loginPage.clickLogin();
-      await loginPage.expectFormValidationErrors();
+      
+      // Button should be disabled when required field is missing
+      await expect(loginPage.loginButton).toBeDisabled();
+      
+      // Touch the partner field to trigger validation
+      await loginPage.partnerSelect.click();
+      await loginPage.partnerSelect.blur();
+      
+      // Should show validation error for the empty partner field
+      await expect(loginPage.page.locator('.form-error')).toContainText('Please select your organization');
     });
 
     test('should show error for missing user ID', async () => {
+      // Fill other fields but leave user ID empty
       await loginPage.selectPartner('acme-healthcare');
       await loginPage.selectRole('PartnerUser');
-      await loginPage.clickLogin();
-      await loginPage.expectFormValidationErrors();
+      
+      // Button should be disabled when required field is missing
+      await expect(loginPage.loginButton).toBeDisabled();
+      
+      // Touch the user ID field to trigger validation
+      await loginPage.userIdInput.click();
+      await loginPage.userIdInput.blur();
+      
+      // Should show validation error for the empty user ID field
+      await expect(loginPage.page.locator('.form-error')).toContainText('User ID is required');
     });
 
     test('should show error for missing role selection', async () => {
+      // Fill other fields but leave role empty
       await loginPage.selectPartner('acme-healthcare');
       await loginPage.enterUserId('test.user');
-      await loginPage.clickLogin();
-      await loginPage.expectFormValidationErrors();
+      
+      // Button should be disabled when required field is missing
+      await expect(loginPage.loginButton).toBeDisabled();
+      
+      // Touch the role field to trigger validation
+      await loginPage.roleSelect.click();
+      await loginPage.roleSelect.blur();
+      
+      // Should show validation error for the empty role field
+      await expect(loginPage.page.locator('.form-error')).toContainText('Please select your role');
     });
 
     test('should enable login button when all fields are filled', async () => {

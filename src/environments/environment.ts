@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://localhost:7001/api',
-  sseBaseUrl: 'https://localhost:7001/api/events/stream',
+  apiBaseUrl: 'https://localhost:7218/api',
+  sseBaseUrl: 'https://localhost:7218/api/events/stream',
   enableLogging: true,
   enableTelemetry: false,
   mockData: true,

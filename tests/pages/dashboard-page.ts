@@ -15,7 +15,7 @@ export class DashboardPage {
     this.userInfo = page.locator('.user-info');
     this.userIdDisplay = page.locator('.user-id');
     this.userRoleDisplay = page.locator('.user-role');
-    this.logoutButton = page.locator('button:has-text("Logout")');
+    this.logoutButton = page.locator('button:has-text("Sign Out")');
     this.navigationMenu = page.locator('nav');
   }
 
