@@ -78,7 +78,6 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
 
       <div class="kpi-tile" [class.success]="connectionSuccessRate() >= 95" [class.warning]="connectionSuccessRate() < 95 && connectionSuccessRate() >= 90" [class.error]="connectionSuccessRate() < 90">
         <div class="kpi-header">
-          <mat-icon class="kpi-icon">wifi</mat-icon>
           <span class="kpi-label">Connection Health</span>
         </div>
         <div class="kpi-value">{{ connectionSuccessRate().toFixed(1) }}%</div>
@@ -95,7 +94,6 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
 
       <div class="kpi-tile" [class.highlight]="(summary()?.largeFileCount24h || 0) > 0">
         <div class="kpi-header">
-          <mat-icon class="kpi-icon">file_copy</mat-icon>
           <span class="kpi-label">Large Files</span>
         </div>
         <div class="kpi-value">{{ summary()?.largeFileCount24h || 0 }}</div>
@@ -162,11 +160,6 @@ import { DashboardSummaryDto } from '../../../core/models/dto.models';
       align-items: center;
       gap: 0.75rem;
       margin-bottom: 1rem;
-    }
-
-    .kpi-icon {
-      color: var(--primary-blue-gray);
-      font-size: 1.25rem;
     }
 
     .kpi-label {

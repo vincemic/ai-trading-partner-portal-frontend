@@ -127,15 +127,21 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
     .layout-container {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
       background: var(--background-section);
+      overflow: hidden;
     }
 
     .navbar {
       background: var(--white);
       border-bottom: 1px solid #E9ECEF;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      flex-shrink: 0;
     }
 
     .navbar-content {
@@ -315,12 +321,17 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
       width: 100%;
       margin: 0 auto;
       padding: 2rem 1.5rem;
+      padding-top: calc(4rem + 2rem); /* 4rem for navbar height + 2rem for content padding */
+      overflow-y: auto;
+      height: calc(100vh - 4rem); /* Full height minus navbar height */
     }
 
     .footer {
       background: var(--white);
       border-top: 1px solid #E9ECEF;
       padding: 1rem 0;
+      flex-shrink: 0;
+      margin-top: auto;
     }
 
     .footer-content {
@@ -385,6 +396,8 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
 
       .main-content {
         padding: 1rem;
+        padding-top: calc(8rem + 1rem); /* Account for taller mobile navbar + content padding */
+        height: calc(100vh - 8rem); /* Adjust for mobile navbar height */
       }
 
       .footer-content {

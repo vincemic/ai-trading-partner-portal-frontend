@@ -35,7 +35,6 @@ import {
         
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon>analytics</mat-icon>
             Advanced Metrics
           </mat-panel-title>
           <mat-panel-description>
@@ -68,7 +67,6 @@ import {
               @if (connectionStatus()) {
                 <div class="status-info">
                   <div class="status-item" [class]="getConnectionStatusClass()">
-                    <mat-icon>{{ getConnectionStatusIcon() }}</mat-icon>
                     <div class="status-details">
                       <div class="status-value">{{ connectionStatus()!.status }}</div>
                       <div class="status-label">Last Check: {{ formatTime(connectionStatus()!.lastCheck) }}</div>
@@ -143,7 +141,6 @@ import {
             @if (hasFailureBursts()) {
               <div class="metric-section alert-section">
                 <h4>
-                  <mat-icon color="warn">warning</mat-icon>
                   Failure Burst Alerts
                 </h4>
                 <div class="alert-list">
@@ -160,7 +157,6 @@ import {
             @if (isZeroFileWindowFlagged()) {
               <div class="metric-section alert-section">
                 <h4>
-                  <mat-icon color="warn">warning</mat-icon>
                   Zero File Window Alert
                 </h4>
                 <div class="alert-item">
@@ -588,22 +584,6 @@ export class AdvancedMetricsPanelComponent {
         return 'offline';
       default:
         return 'warning';
-    }
-  }
-
-  getConnectionStatusIcon(): string {
-    const status = this.connectionStatus();
-    if (!status) return 'help';
-    
-    switch (status.status.toLowerCase()) {
-      case 'online':
-      case 'connected':
-        return 'wifi';
-      case 'offline':
-      case 'disconnected':
-        return 'wifi_off';
-      default:
-        return 'wifi_tethering';
     }
   }
 
