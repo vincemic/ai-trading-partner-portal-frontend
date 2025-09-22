@@ -14,7 +14,7 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
       <header class="navbar">
         <div class="navbar-content">
           <div class="navbar-brand">
-            <img src="assets/logos/portal-logo-primary.svg" alt="PointC Trading Portal" class="portal-logo">
+            <img src="assets/logos/pointc-logo-color.png" alt="PointC Trading Portal" class="portal-logo">
           </div>
 
           <nav class="nav-menu" role="navigation" aria-label="Main navigation">

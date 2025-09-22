@@ -20,7 +20,7 @@ interface LoginForm {
       <div class="login-card">
         <div class="login-header">
           <div class="logo-container">
-            <img src="assets/logos/portal-logo-primary.svg" alt="Point C Health Trading Portal" class="portal-logo">
+            <img src="assets/logos/pointc-logo-color.png" alt="Point C Health Trading Portal" class="portal-logo">
           </div>
           <h1 class="login-title">Point C Health Trading Portal</h1>
           <p class="login-subtitle">Access your EDI management dashboard</p>
