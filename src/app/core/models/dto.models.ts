@@ -237,7 +237,7 @@ export interface HealthStatus {
 
 // SSE event types
 export interface SseEvent {
-  type: 'file.created' | 'file.statusChanged' | 'key.promoted' | 'key.revoked' | 'dashboard.metricsTick' | 
+  type: 'connection' | 'file.created' | 'file.statusChanged' | 'key.promoted' | 'key.revoked' | 'dashboard.metricsTick' | 
         'sftp.connectionStatusChanged' | 'sftp.failureBurstAlert' | 'sftp.zeroFileWindowAlert' | 'throughput.tick';
   data: any;
   id?: string;

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardStore } from '../../state/dashboard.store';
+import { SseClientService } from '../../core/services/sse-client.service';
 import { KpiTilesComponent } from './components/kpi-tiles.component';
 import { FileCountsChartComponent } from './components/file-counts-chart.component';
 import { SuccessRatioChartComponent } from './components/success-ratio-chart.component';
@@ -165,7 +166,10 @@ import { AdvancedMetricsPanelComponent } from './components/advanced-metrics-pan
   `]
 })
 export class DashboardPageComponent implements OnInit, OnDestroy {
-  constructor(private dashboardStore: DashboardStore) {}
+  constructor(
+    private dashboardStore: DashboardStore,
+    private sseClientService: SseClientService
+  ) {}
 
   get loading() {
     return this.dashboardStore.loading;
@@ -232,6 +236,9 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    // Connect to SSE for real-time updates
+    this.sseClientService.connect();
+    
     try {
       await this.dashboardStore.load();
     } catch (error) {
@@ -240,7 +247,8 @@ export class DashboardPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Optional cleanup if needed
+    // Disconnect SSE when leaving dashboard
+    this.sseClientService.disconnect();
   }
 
   async refresh(): Promise<void> {

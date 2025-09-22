@@ -61,7 +61,7 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
               <div class="connection-status">
                 @switch (connectionStatus()) {
                   @case ('connected') {
-                    <span class="status-indicator connected" title="Real-time updates active">
+                    <span class="status-indicator connected" title="Real-time updates active - Dashboard data refreshes automatically">
                       <span class="status-dot"></span>
                       Live
                     </span>
@@ -73,13 +73,13 @@ import { LoadingIndicatorService } from '../core/services/loading-indicator.serv
                     </span>
                   }
                   @case ('error') {
-                    <span class="status-indicator error" title="Real-time updates unavailable">
+                    <span class="status-indicator error" title="Real-time updates unavailable - Dashboard updates manually">
                       <span class="status-dot"></span>
                       Offline
                     </span>
                   }
                   @default {
-                    <span class="status-indicator disconnected" title="Real-time updates disconnected">
+                    <span class="status-indicator disconnected" title="Real-time updates disconnected - Dashboard updates manually">
                       <span class="status-dot"></span>
                       Disconnected
                     </span>

@@ -340,7 +340,7 @@ Returns information about periods with no file activity.
 GET /api/events/stream
 ```
 
-Establishes a Server-Sent Events connection for real-time notifications about key operations and system events.
+Establishes a Server-Sent Events connection for real-time notifications about key operations, file events, dashboard metrics, and system status changes.
 
 **Authentication Methods:**
 
@@ -362,29 +362,48 @@ Establishes a Server-Sent Events connection for real-time notifications about ke
 - `token`: Session token for authentication (alternative to header)
 - `lastEventId`: Resume from specific event sequence (alternative to header)
 
+**CORS Support:**
+
+The endpoint includes proper CORS headers for frontend integration:
+
+- `Access-Control-Allow-Origin: http://localhost:4200`
+- `Access-Control-Allow-Credentials: true`
+
 **Response Format:**
 
-The endpoint returns a continuous stream of events in SSE format:
+The endpoint returns a continuous stream of events in SSE format, starting with an immediate connection confirmation:
 
 ```text
+event: connection
+id: connection
+data: {"status":"connected","timestamp":"2025-09-21T10:00:00.000Z"}
+
+event: dashboard.metricsTick
+id: metrics-1727175000000
+data: {"inboundFiles24h":45,"outboundFiles24h":38,"successRate":94.2,"timestamp":"2025-09-21T10:01:00.000Z"}
+
 event: key.promoted
 id: 1
-data: {"keyId":"abc123","previousPrimaryKeyId":"def456"}
-
-event: key.revoked  
-id: 2
-data: {"keyId":"xyz789"}
-
-:hb
+data: {"keyId":"abc123","partnerId":"11111111-1111-1111-1111-111111111111","timestamp":"2025-09-21T10:02:00.000Z"}
 
 event: file.created
+id: 2
+data: {"fileId":"file123","fileName":"order_20250921.edi","status":"Processing","direction":"Inbound","docType":"850","timestamp":"2025-09-21T10:03:00.000Z"}
+
+event: throughput.tick
 id: 3
-data: {"fileId":"file123","direction":"Inbound","docType":"850"}
+data: {"timestamp":"2025-09-21T10:04:00.000Z","totalBytes":2048576,"fileCount":12,"avgFileSizeBytes":170714.7}
+
+:hb
 ```
 
 #### Event Types
 
 The SSE stream delivers these event types:
+
+**Connection Events:**
+
+- `connection`: Sent immediately when client connects to confirm successful connection
 
 **Key Management Events:**
 
@@ -398,7 +417,14 @@ The SSE stream delivers these event types:
 
 **Dashboard Events:**
 
-- `dashboard.metricsTick`: Real-time dashboard metrics update
+- `dashboard.metricsTick`: Real-time dashboard metrics update (sent every 30 seconds)
+
+**System Monitoring Events:**
+
+- `throughput.tick`: Throughput metrics for bandwidth monitoring
+- `sftp.connectionStatusChanged`: SFTP connection status updates
+- `sftp.failureBurstAlert`: Alert for connection failure bursts
+- `sftp.zeroFileWindowAlert`: Alert when no files received in time window
 
 **Connection Management:**
 
@@ -406,12 +432,23 @@ The SSE stream delivers these event types:
 
 #### Event Data Schemas
 
+**Connection Event:**
+
+```json
+{
+  "status": "connected",
+  "timestamp": "2025-09-21T10:00:00.000Z"
+}
+```
+
 **Key Promoted Event:**
 
 ```json
 {
   "keyId": "string",
-  "previousPrimaryKeyId": "string|null"
+  "partnerId": "string",
+  "previousPrimaryKeyId": "string|null",
+  "timestamp": "2025-09-21T10:00:00.000Z"
 }
 ```
 
@@ -419,7 +456,10 @@ The SSE stream delivers these event types:
 
 ```json
 {
-  "keyId": "string"
+  "keyId": "string",
+  "partnerId": "string",
+  "reason": "string|null",
+  "timestamp": "2025-09-21T10:00:00.000Z"
 }
 ```
 
@@ -428,12 +468,85 @@ The SSE stream delivers these event types:
 ```json
 {
   "fileId": "string",
+  "fileName": "string",
+  "status": "Processing|Completed|Failed",
   "direction": "Inbound|Outbound", 
-  "docType": "string"
+  "docType": "string",
+  "timestamp": "2025-09-21T10:00:00.000Z"
 }
 ```
 
 **File Status Changed Event:**
+
+```json
+{
+  "fileId": "string",
+  "fileName": "string",
+  "status": "Processing|Completed|Failed",
+  "oldStatus": "string",
+  "newStatus": "string",
+  "timestamp": "2025-09-21T10:00:00.000Z"
+}
+```
+
+**Dashboard Metrics Tick Event:**
+
+```json
+{
+  "inboundFiles24h": 45,
+  "outboundFiles24h": 38,
+  "successRate": 94.2,
+  "avgProcessingTime": 12.5,
+  "openErrors": 3,
+  "totalBytes24h": 15728640,
+  "avgFileSizeBytes": 189456.3,
+  "connectionSuccessRate24h": 98.1,
+  "largeFileCount24h": 2,
+  "timestamp": "2025-09-21T10:00:00.000Z"
+}
+```
+
+**Throughput Tick Event:**
+
+```json
+{
+  "timestamp": "2025-09-21T10:00:00.000Z",
+  "totalBytes": 2048576,
+  "fileCount": 12,
+  "avgFileSizeBytes": 170714.7
+}
+```
+
+**SFTP Connection Status Changed Event:**
+
+```json
+{
+  "partnerId": "string",
+  "status": "Connected|Disconnected|Failed",
+  "lastCheck": "2025-09-21T10:00:00.000Z"
+}
+```
+
+**SFTP Failure Burst Alert Event:**
+
+```json
+{
+  "windowStart": "2025-09-21T08:00:00.000Z",
+  "failureCount": 8,
+  "partnerId": "string"
+}
+```
+
+**SFTP Zero File Window Alert Event:**
+
+```json
+{
+  "windowHours": 4,
+  "inboundFiles": 0,
+  "flagged": true,
+  "partnerId": "string"
+}
+```
 
 ```json
 {
@@ -449,37 +562,97 @@ The SSE stream delivers these event types:
 // Establish SSE connection with query parameter authentication
 // Note: EventSource doesn't support custom headers in most browsers
 function connectToEventStream() {
+  const sessionToken = getSessionToken(); // Your auth token
   const eventSource = new EventSource(`/api/events/stream?token=${sessionToken}`);
+
+  // Handle connection confirmation (first event received)
+  eventSource.addEventListener('connection', (event) => {
+    const data = JSON.parse(event.data);
+    console.log('SSE connected:', data.status, data.timestamp);
+    // Update UI to show "Connected" status
+    updateConnectionStatus('connected');
+  });
+
+  // Handle real-time dashboard metrics (every 30 seconds)
+  eventSource.addEventListener('dashboard.metricsTick', (event) => {
+    const metrics = JSON.parse(event.data);
+    console.log('Dashboard metrics updated:', metrics);
+    // Update dashboard displays with fresh data
+    updateDashboardMetrics(metrics);
+  });
 
   // Handle key promotion events
   eventSource.addEventListener('key.promoted', (event) => {
     const data = JSON.parse(event.data);
-    console.log('Key promoted:', data.keyId);
+    console.log('Key promoted:', data.keyId, 'for partner:', data.partnerId);
     // Update UI to reflect new primary key
     updateKeyStatus(data.keyId, 'primary');
+    showNotification(`Key ${data.keyId} promoted to primary`);
   });
 
   // Handle key revocation events
   eventSource.addEventListener('key.revoked', (event) => {
     const data = JSON.parse(event.data);
-    console.log('Key revoked:', data.keyId);
+    console.log('Key revoked:', data.keyId, 'reason:', data.reason);
     // Update UI to show revoked status
     updateKeyStatus(data.keyId, 'revoked');
+    showNotification(`Key ${data.keyId} has been revoked`);
   });
 
   // Handle file events
   eventSource.addEventListener('file.created', (event) => {
     const data = JSON.parse(event.data);
-    console.log('New file:', data.fileId, data.direction);
+    console.log('New file:', data.fileName, data.direction);
     // Update dashboard or file list
+    addFileToList(data);
     refreshDashboard();
+  });
+
+  eventSource.addEventListener('file.statusChanged', (event) => {
+    const data = JSON.parse(event.data);
+    console.log('File status changed:', data.fileName, 'from', data.oldStatus, 'to', data.newStatus);
+    // Update file status in UI
+    updateFileStatus(data.fileId, data.newStatus);
+  });
+
+  // Handle throughput monitoring
+  eventSource.addEventListener('throughput.tick', (event) => {
+    const data = JSON.parse(event.data);
+    console.log('Throughput update:', data.totalBytes, 'bytes,', data.fileCount, 'files');
+    // Update bandwidth charts or displays
+    updateThroughputChart(data);
+  });
+
+  // Handle SFTP alerts
+  eventSource.addEventListener('sftp.connectionStatusChanged', (event) => {
+    const data = JSON.parse(event.data);
+    console.log('SFTP status changed:', data.status);
+    updateSftpStatus(data.status);
+  });
+
+  eventSource.addEventListener('sftp.failureBurstAlert', (event) => {
+    const data = JSON.parse(event.data);
+    console.warn('SFTP failure burst detected:', data.failureCount, 'failures');
+    showAlert(`Connection failures detected: ${data.failureCount} failures since ${data.windowStart}`);
+  });
+
+  eventSource.addEventListener('sftp.zeroFileWindowAlert', (event) => {
+    const data = JSON.parse(event.data);
+    if (data.flagged) {
+      console.warn('No files received in', data.windowHours, 'hours');
+      showAlert(`No inbound files received in the last ${data.windowHours} hours`);
+    }
   });
 
   // Handle connection errors
   eventSource.onerror = (error) => {
     console.error('SSE connection error:', error);
+    updateConnectionStatus('disconnected');
     // Implement exponential backoff reconnection
-    setTimeout(() => connectToEventStream(), 5000);
+    setTimeout(() => {
+      eventSource.close();
+      connectToEventStream();
+    }, 5000);
   };
 
   // Store last event ID for reconnection
@@ -494,24 +667,31 @@ function connectToEventStream() {
 
 // Reconnection with event replay using query parameters
 function reconnectWithReplay() {
+  const sessionToken = getSessionToken();
   const lastEventId = localStorage.getItem('lastEventId');
   let url = `/api/events/stream?token=${sessionToken}`;
   if (lastEventId) {
     url += `&lastEventId=${lastEventId}`;
   }
-  const eventSource = new EventSource(url);
-  const url = lastEventId 
-    ? `/api/events/stream?lastEventId=${lastEventId}`
-    : '/api/events/stream';
-    
-  const eventSource = new EventSource(url, {
-    headers: {
-      'X-Session-Token': sessionToken,
-      'Last-Event-ID': lastEventId || ''
-    }
-  });
   
+  const eventSource = new EventSource(url);
   // ... handle events as above
+  return eventSource;
+}
+
+// Helper functions for UI updates
+function updateConnectionStatus(status) {
+  const statusElement = document.getElementById('connection-status');
+  statusElement.textContent = status === 'connected' ? 'Connected' : 'Connecting...';
+  statusElement.className = status === 'connected' ? 'status-connected' : 'status-connecting';
+}
+
+function updateDashboardMetrics(metrics) {
+  document.getElementById('inbound-files').textContent = metrics.inboundFiles24h;
+  document.getElementById('outbound-files').textContent = metrics.outboundFiles24h;
+  document.getElementById('success-rate').textContent = `${metrics.successRate}%`;
+  document.getElementById('avg-processing-time').textContent = `${metrics.avgProcessingTime}s`;
+  document.getElementById('open-errors').textContent = metrics.openErrors;
 }
 ```
 
@@ -522,25 +702,36 @@ function reconnectWithReplay() {
 - Always handle connection errors and implement reconnection logic
 - Use exponential backoff for reconnection attempts (start with 1s, max 30s)
 - Store the `Last-Event-ID` to resume from the correct point after disconnection
+- Monitor the `connection` event to confirm successful connection before showing "Connected" status
 
 **Event Handling:**
 
 - Parse event data as JSON
 - Implement event-specific handlers for different event types
 - Update UI incrementally rather than refreshing entire sections
+- Handle the `dashboard.metricsTick` event for automatic dashboard updates every 30 seconds
+- Use timestamp fields in events to handle ordering and detect stale data
 
 **Performance:**
 
 - Limit to one SSE connection per browser tab
 - Close connections when navigating away from pages that need real-time updates
 - Use heartbeat events to detect broken connections
+- Debounce UI updates for high-frequency events like `throughput.tick`
+
+**Real-time Features:**
+
+- **Connection Status**: Show "Connecting..." initially, then "Connected" after receiving `connection` event
+- **Dashboard Auto-refresh**: No need for polling - dashboard metrics update automatically via SSE
+- **Live Notifications**: Use file events and alert events to show real-time system status
+- **Alert Handling**: Implement priority levels for different alert types (info, warning, critical)
 
 **Browser Compatibility & Authentication:**
 
 - **EventSource Limitation**: Native JavaScript EventSource doesn't support custom headers in most browsers
 - **Solution**: Use query parameter authentication (`?token=sessionToken`) for maximum compatibility
 - **Development Proxies**: Query parameters work seamlessly with webpack dev server, Vite, and other proxy configurations
-- **CORS-Friendly**: Query parameters don't trigger preflight requests like custom headers
+- **CORS Support**: SSE endpoint now includes proper CORS headers for `localhost:4200` development
 
 **Error Handling:**
 
@@ -575,6 +766,150 @@ eventSource.addEventListener('error', (event) => {
 
 - Handle 401/403 errors by redirecting to login
 - **Proxy-friendly**: Query parameters work seamlessly with development proxies
+
+#### Integration Guide for SSE Events
+
+**Dashboard Integration:**
+
+```javascript
+// Real-time dashboard that automatically updates
+class DashboardManager {
+  constructor() {
+    this.eventSource = null;
+    this.metrics = {};
+  }
+
+  connect() {
+    this.eventSource = new EventSource(`/api/events/stream?token=${getSessionToken()}`);
+    
+    // Show connected status when SSE connects
+    this.eventSource.addEventListener('connection', () => {
+      this.updateConnectionIndicator('connected');
+    });
+
+    // Auto-refresh dashboard every 30 seconds via SSE
+    this.eventSource.addEventListener('dashboard.metricsTick', (event) => {
+      this.metrics = JSON.parse(event.data);
+      this.renderDashboard();
+    });
+
+    // Show real-time file activity
+    this.eventSource.addEventListener('file.created', (event) => {
+      const file = JSON.parse(event.data);
+      this.addFileToActivityFeed(file);
+      this.playNotificationSound();
+    });
+
+    // Update file statuses in real-time
+    this.eventSource.addEventListener('file.statusChanged', (event) => {
+      const file = JSON.parse(event.data);
+      this.updateFileStatus(file.fileId, file.newStatus);
+    });
+  }
+
+  renderDashboard() {
+    // Update metrics displays
+    document.getElementById('inbound-count').textContent = this.metrics.inboundFiles24h;
+    document.getElementById('success-rate').textContent = `${this.metrics.successRate}%`;
+    // ... update other metrics
+  }
+}
+```
+
+**Alert System Integration:**
+
+```javascript
+// Alert manager for system monitoring events
+class AlertManager {
+  constructor() {
+    this.alerts = [];
+    this.setupSSEListeners();
+  }
+
+  setupSSEListeners() {
+    const eventSource = getEventSource(); // Your SSE connection
+
+    // SFTP connection monitoring
+    eventSource.addEventListener('sftp.connectionStatusChanged', (event) => {
+      const data = JSON.parse(event.data);
+      if (data.status === 'Failed' || data.status === 'Disconnected') {
+        this.showAlert('warning', `SFTP connection ${data.status.toLowerCase()}`);
+      } else {
+        this.clearAlert('sftp-connection');
+      }
+    });
+
+    // Failure burst detection
+    eventSource.addEventListener('sftp.failureBurstAlert', (event) => {
+      const data = JSON.parse(event.data);
+      this.showAlert('critical', 
+        `Connection failures detected: ${data.failureCount} failures since ${new Date(data.windowStart).toLocaleTimeString()}`
+      );
+    });
+
+    // File inactivity monitoring
+    eventSource.addEventListener('sftp.zeroFileWindowAlert', (event) => {
+      const data = JSON.parse(event.data);
+      if (data.flagged) {
+        this.showAlert('warning', 
+          `No inbound files received in the last ${data.windowHours} hours`
+        );
+      }
+    });
+  }
+
+  showAlert(severity, message) {
+    const alert = { id: Date.now(), severity, message, timestamp: new Date() };
+    this.alerts.unshift(alert);
+    this.renderAlerts();
+    
+    // Show toast notification
+    this.showToast(severity, message);
+  }
+}
+```
+
+**Performance Monitoring:**
+
+```javascript
+// Bandwidth and throughput monitoring
+class PerformanceMonitor {
+  constructor() {
+    this.throughputData = [];
+    this.setupSSEListeners();
+  }
+
+  setupSSEListeners() {
+    const eventSource = getEventSource();
+
+    // Real-time throughput updates
+    eventSource.addEventListener('throughput.tick', (event) => {
+      const data = JSON.parse(event.data);
+      this.addThroughputDataPoint(data);
+      this.updateBandwidthChart();
+    });
+  }
+
+  addThroughputDataPoint(data) {
+    this.throughputData.push({
+      timestamp: new Date(data.timestamp),
+      bytes: data.totalBytes,
+      files: data.fileCount,
+      avgFileSize: data.avgFileSizeBytes
+    });
+
+    // Keep only last 100 data points for real-time chart
+    if (this.throughputData.length > 100) {
+      this.throughputData.shift();
+    }
+  }
+
+  updateBandwidthChart() {
+    // Update your chart library (Chart.js, D3, etc.)
+    // this.chart.update(this.throughputData);
+  }
+}
+```
 
 ### PGP Key Management
 

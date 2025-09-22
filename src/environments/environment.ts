@@ -5,7 +5,7 @@ export const environment = {
   enableLogging: true,
   enableTelemetry: false,
   mockData: false,
-  sseEnabled: true, // Enabled - using real backend at https://localhost:7096
+  sseEnabled: true, // Enabled - will fall back to mock SSE when backend not available
   pollingFallbackInterval: 60000, // 60 seconds
   maxConcurrentSseConnections: 3,
   sessionTokenKey: 'portalSessionToken'

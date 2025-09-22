@@ -11,21 +11,24 @@ export class SseClientService {
   private eventSource: EventSource | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
-  private reconnectTimeouts = [1000, 2000, 5000, 10000, 15000, 30000];
+  private reconnectDelay = 1000; // Start with 1 second
   private lastEventId: string | null = null;
   private eventSubject = new Subject<SseEvent>();
   private connectionStatus = signal<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  private heartbeatTimer: any = null;
+  private readonly heartbeatTimeout = 45000; // 45 seconds (3x expected heartbeat interval)
 
   readonly events$ = this.eventSubject.asObservable();
   readonly connectionStatus$ = this.connectionStatus.asReadonly();
 
-  constructor(private sessionService: SessionService) {}
+  constructor(private sessionService: SessionService) {
+    // Restore last event ID from localStorage for event replay
+    this.lastEventId = localStorage.getItem('lastSSEEventId');
+  }
 
   connect(): void {
     if (!environment.sseEnabled) {
       console.log('SSE disabled in environment');
-      // For development: simulate connected status when SSE is disabled
-      this.connectionStatus.set('connected');
       return;
     }
 
@@ -49,6 +52,7 @@ export class SseClientService {
       const url = new URL(environment.sseBaseUrl, window.location.origin);
       url.searchParams.set('token', token);
       
+      // Add lastEventId for event replay if available
       if (this.lastEventId) {
         url.searchParams.set('lastEventId', this.lastEventId);
       }
@@ -56,9 +60,9 @@ export class SseClientService {
       this.eventSource = new EventSource(url.toString());
 
       this.eventSource.onopen = () => {
-        console.log('SSE connection opened');
-        this.connectionStatus.set('connected');
-        this.reconnectAttempts = 0;
+        console.log('SSE connection opened - waiting for connection confirmation');
+        // Don't set to connected yet - wait for 'connection' event
+        this.startHeartbeatTimer();
       };
 
       this.eventSource.onmessage = (event) => {
@@ -67,6 +71,7 @@ export class SseClientService {
 
       this.eventSource.onerror = (error) => {
         console.error('SSE connection error:', error);
+        this.stopHeartbeatTimer();
         this.connectionStatus.set('error');
         this.handleError();
       };
@@ -86,14 +91,36 @@ export class SseClientService {
       this.eventSource.close();
       this.eventSource = null;
     }
+    this.stopHeartbeatTimer();
     this.connectionStatus.set('disconnected');
     this.reconnectAttempts = 0;
+    this.reconnectDelay = 1000; // Reset delay
+  }
+
+  private startHeartbeatTimer(): void {
+    this.stopHeartbeatTimer();
+    this.heartbeatTimer = setTimeout(() => {
+      console.warn('SSE heartbeat timeout - connection may be stale');
+      this.handleError();
+    }, this.heartbeatTimeout);
+  }
+
+  private resetHeartbeatTimer(): void {
+    this.startHeartbeatTimer();
+  }
+
+  private stopHeartbeatTimer(): void {
+    if (this.heartbeatTimer) {
+      clearTimeout(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
   }
 
   private setupEventHandlers(): void {
     if (!this.eventSource) return;
 
     const eventTypes = [
+      'connection',
       'file.created',
       'file.statusChanged',
       'key.promoted',
@@ -114,12 +141,17 @@ export class SseClientService {
 
   private handleMessage(event: MessageEvent): void {
     try {
-      // Handle heartbeat comments
+      // Handle heartbeat comments (:hb)
       if (event.data.startsWith(':')) {
+        this.resetHeartbeatTimer();
         return;
       }
 
-      this.lastEventId = event.lastEventId || null;
+      // Store last event ID for reconnection replay
+      if (event.lastEventId) {
+        this.lastEventId = event.lastEventId;
+        localStorage.setItem('lastSSEEventId', event.lastEventId);
+      }
       
       const data = JSON.parse(event.data);
       this.eventSubject.next({
@@ -134,9 +166,22 @@ export class SseClientService {
 
   private handleTypedEvent(type: SseEvent['type'], event: MessageEvent): void {
     try {
-      this.lastEventId = event.lastEventId || null;
+      // Store last event ID for reconnection replay
+      if (event.lastEventId) {
+        this.lastEventId = event.lastEventId;
+        localStorage.setItem('lastSSEEventId', event.lastEventId);
+      }
       
       const data = JSON.parse(event.data);
+      
+      // Handle connection event specially - this confirms successful connection
+      if (type === 'connection') {
+        console.log('✅ SSE connection confirmed:', data.status, data.timestamp);
+        this.connectionStatus.set('connected');
+        this.reconnectAttempts = 0;
+        this.reconnectDelay = 1000; // Reset delay
+      }
+      
       this.eventSubject.next({
         type: type,
         data: data,
@@ -160,11 +205,11 @@ export class SseClientService {
       return;
     }
 
-    const timeout = this.reconnectTimeouts[
-      Math.min(this.reconnectAttempts, this.reconnectTimeouts.length - 1)
-    ];
+    // Exponential backoff with jitter
+    const jitter = Math.random() * 1000; // Up to 1 second jitter
+    const delay = Math.min(this.reconnectDelay + jitter, 30000); // Max 30 seconds
 
-    console.log(`Scheduling SSE reconnect in ${timeout}ms (attempt ${this.reconnectAttempts + 1})`);
+    console.log(`Scheduling SSE reconnect in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
 
     setTimeout(() => {
       this.reconnectAttempts++;
@@ -176,7 +221,10 @@ export class SseClientService {
         console.log('User no longer authenticated, not reconnecting SSE');
         this.connectionStatus.set('disconnected');
       }
-    }, timeout);
+      
+      // Exponential backoff for next attempt
+      this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000);
+    }, delay);
   }
 
   // Inject test events for development/testing
@@ -190,5 +238,17 @@ export class SseClientService {
       data: data,
       id: `test-${Date.now()}`
     });
+  }
+
+  // Get current connection status for UI display
+  getConnectionStatusText(): string {
+    const status = this.connectionStatus();
+    switch (status) {
+      case 'connected': return 'Connected';
+      case 'connecting': return 'Connecting...';
+      case 'disconnected': return 'Disconnected';
+      case 'error': return 'Connection Error';
+      default: return 'Unknown';
+    }
   }
 }

@@ -101,6 +101,9 @@ export class DashboardStore {
   private setupSseSubscription(): void {
     this.sseClientService.events$.subscribe((event: SseEvent) => {
       switch (event.type) {
+        case 'connection':
+          this.handleConnectionEvent(event.data);
+          break;
         case 'dashboard.metricsTick':
           this.handleMetricsTick(event.data);
           break;
@@ -115,6 +118,17 @@ export class DashboardStore {
           break;
         case 'sftp.connectionStatusChanged':
           this.handleConnectionStatusChanged(event.data);
+          break;
+        case 'file.created':
+          this.handleFileCreated(event.data);
+          break;
+        case 'file.statusChanged':
+          this.handleFileStatusChanged(event.data);
+          break;
+        case 'key.promoted':
+        case 'key.revoked':
+          // These might trigger dashboard summary updates
+          this.handleKeyEvent(event.type, event.data);
           break;
       }
     });
@@ -212,19 +226,63 @@ export class DashboardStore {
   }
 
   private handleMetricsTick(data: any): void {
-    // Update summary with incremental data
-    if (data.summary) {
-      this._summary.set(data.summary);
-    }
-    
-    // Update time series with new point
-    if (data.timeSeriesPoint) {
-      const currentSeries = this._timeSeries();
-      if (currentSeries) {
-        const updatedPoints = [...currentSeries.points, data.timeSeriesPoint];
-        this._timeSeries.set({ points: updatedPoints });
+    // Real-time dashboard metrics update (every 30 seconds from backend)
+    // Update the full summary with fresh data from the backend
+    if (data && typeof data === 'object') {
+      console.log('📊 Dashboard metrics updated via SSE:', data);
+      this._summary.set(data);
+      
+      // If this is a time series point update, add it to the chart
+      if (data.timeSeriesPoint) {
+        const currentSeries = this._timeSeries();
+        if (currentSeries) {
+          const updatedPoints = [...currentSeries.points, data.timeSeriesPoint];
+          // Keep only last 48 hours of data points (assuming hourly updates)
+          const maxPoints = 48;
+          if (updatedPoints.length > maxPoints) {
+            updatedPoints.splice(0, updatedPoints.length - maxPoints);
+          }
+          this._timeSeries.set({ points: updatedPoints });
+        }
       }
     }
+  }
+
+  private handleConnectionEvent(data: any): void {
+    // SSE connection confirmed event
+    console.log('🔗 SSE connection confirmed:', data.status, data.timestamp);
+    // Connection status is already handled by SSE service
+    // This is just for logging/debugging
+  }
+
+  private handleFileCreated(data: any): void {
+    console.log('📄 New file created:', data.fileName, data.direction);
+    // Increment counters in real-time
+    const currentSummary = this._summary();
+    if (currentSummary) {
+      const updated = { ...currentSummary };
+      if (data.direction === 'Inbound') {
+        updated.inboundFiles24h += 1;
+      } else if (data.direction === 'Outbound') {
+        updated.outboundFiles24h += 1;
+      }
+      this._summary.set(updated);
+    }
+  }
+
+  private handleFileStatusChanged(data: any): void {
+    console.log('📄 File status changed:', data.fileName, data.oldStatus, '->', data.newStatus);
+    // Update success rate if a file completed or failed
+    if (data.newStatus === 'Completed' || data.newStatus === 'Failed') {
+      // Could trigger a refresh of summary data or update counters
+      // For now, we'll let the periodic dashboard.metricsTick handle this
+    }
+  }
+
+  private handleKeyEvent(eventType: string, data: any): void {
+    console.log('🔑 Key event:', eventType, data.keyId);
+    // Key operations might affect dashboard - could trigger a refresh
+    // For now, just log the event
   }
 
   private handleThroughputTick(data: ThroughputPointDto): void {
