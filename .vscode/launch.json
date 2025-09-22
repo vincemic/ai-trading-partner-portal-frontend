@@ -6,7 +6,6 @@
       "name": "Start Development Server",
       "type": "node",
       "request": "launch",
-      "preLaunchTask": "dev-server-start",
       "program": "${workspaceFolder}/node_modules/@angular/cli/bin/ng",
       "args": ["serve", "--proxy-config", "proxy.conf.json"],
       "console": "integratedTerminal",
