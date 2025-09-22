@@ -5,11 +5,12 @@
     {
       "name": "Start Development Server",
       "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/node_modules/@angular/cli/bin/ng",
-      "args": ["serve", "--proxy-config", "proxy.conf.json"],
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
+      "request": "attach",
+      "preLaunchTask": "dev-server-start",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "${workspaceFolder}",
       "skipFiles": ["<node_internals>/**"]
     },
     {
@@ -22,10 +23,19 @@
       "sourceMaps": true
     },
     {
-      "name": "ng test",
+      "name": "Debug with Chrome",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "npm: test",
+      "preLaunchTask": "dev-server-validate",
+      "url": "http://localhost:4200/",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMaps": true
+    },
+    {
+      "name": "Run Tests",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "lint: check",
       "url": "http://localhost:9876/debug.html"
     }
   ]
